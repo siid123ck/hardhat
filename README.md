@@ -84,12 +84,12 @@ my-hardhat-project/
 on same folder, write following command:
 `npx hardhat`
 after running that command, it ask us what do we want. we see three options: 
- Create a JavaScript project
- Create a TypeScript project
+ Create a JavaScript project    
+ Create a TypeScript project     
  Create an empty hardhat.config.js
 
  choose " Create an empty hardhat.config.js" using arrow down key and enter. 
- We could choose JavaScript or TypeScript project if we want.
+ We also could choose JavaScript or TypeScript project if we want.
  
 ## Getting Started
 
