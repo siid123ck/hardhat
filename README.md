@@ -90,20 +90,108 @@ after running that command, it ask us what do we want. we see three options:
 
  choose " Create an empty hardhat.config.js" using arrow down key and enter. 
  We also could choose JavaScript or TypeScript project if we want.
+
+
+## Plugin Installation
+
+To install the plugin for Hardhat, use npm by running the following command in your project directory:
+
+`npm install <plugin-name> `   
+
+In this tutorial, we are going to use @nomicfoundation/hardhat-toolbox that has everthing we need to develop smart contracts.   
+Use following command to install this plugin:   
+`npm install --save-dev @nomicfoundation/hardhat-toolbox`   
+
+Then, add following code to your hardhat.config.js file.   
+
+`require('@nomicfoundation/hardhat-toolbox'); `
+
+
+# Tutorials and Topics
+
+## 1. Writing Smart Contracts
+
+With Hardhat installed and configured, you are ready to start writing your first smart contract. Create a new directory named contracts in your project, and inside it, create a file name whatever you want. In this tutorial, I named Token.sol.
+In newly created file, paste the code below; 
+```
+//SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+
+contract Token {
+    string public name = "Hardhat Token";
+    string public symbol = "HT";
+    uint256 public totalSupply = 1000000;
+    address public owner;
+
+    mapping(address => uint256) balances;
+
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+
  
-## Getting Started
+    constructor() {
+        balances[msg.sender] = totalSupply;
+        owner = msg.sender;
+    }
 
-[...]
+    function transfer(address to, uint256 amount) external {
+        require(balances[msg.sender] >= amount, "Not enough tokens");
 
-## Tutorials and Topics
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
 
-### 1. Writing Smart Contracts
+        emit Transfer(msg.sender, to, amount);
+    }
 
-[...]
+    function balanceOf(address account) external view returns (uint256) {
+        return balances[account];
+    }
+}
+```
 
-### 2. Testing
+##  2. compiling contracts 
+To compile your Solidity smart contracts, run the following Hardhat command in your terminal:   
+`npx hardhat compile`   
+Hardhat will compile your contracts and generate the compiled artifacts in the artifacts/ directory.
 
-[...]
+## 3. Testing contracts    
+Writing automated tests when building smart contracts is of crucial, as your user's money is what's at stake.
+
+we are going to use Hardhat Network which comes built-in with Hardhat, and it's used as the default network. You don't need to setup anything to use it.
+
+In our tests we're going to use ethers.js to interact with the Ethereum contract we built in the previous section, and we'll use Mocha as our test runner.
+
+### Writing Tests
+Create a new directory called test inside our project root directory and create a new JavaScript file and you can name anything, but in this tutorial, file name is Token.js. Then paste code below into Token.js file. 
+```
+const { expect } = require("chai");
+
+describe("Token contract", function () {
+  it("Deployment should assign the total supply of tokens to the owner", async function () {
+    const [owner] = await ethers.getSigners();
+
+    const hardhatToken = await ethers.deployContract("Token");
+
+    const ownerBalance = await hardhatToken.balanceOf(owner.address);
+    expect(await hardhatToken.totalSupply()).to.equal(ownerBalance);
+  });
+});
+```
+
+install solidity extenstion on vs code editor, 
+
+notes:   
+1. A Signer  is an object that represents an Ethereum account. It's used to send transactions to contracts and other accounts. Here we're getting a list of the accounts in the node we're connected to, which in this case is Hardhat Network, and we're only keeping the first one.
+2. The ethers variable is available in the global scope. Add the following line of code at the top If you like your code always being explicit:
+   `const { ethers } = require("hardhat");`
+
+3. Calling ethers.deployContract("Token") will start the deployment of our token contract, and return a Promise that resolves to a Contract. This is the object that has a method for each of your smart contract functions.
+   `const hardhatToken = await ethers.deployContract("Token");`
+   After contract is deployed, we can call any function on our contract. The variable hardhatToken is promise object which has access to all methods of our contract. 
+
+### Run test 
+Run following command to test the contract: 
+`npx hardhat test`
 
 ### 3. Deployments and Networks
 
