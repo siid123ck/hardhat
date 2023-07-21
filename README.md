@@ -5,11 +5,11 @@
 1. [Introduction](#introduction)
 2. [Installation and Setup](#installation-and-setup)
 3. [Tutorials and Topics](#tutorials-and-topics)
-    - [1. Writing Smart Contracts](##writing-smart-contracts)
-    - [2. Compiling contracts](##compiling-contracts)
-    - [3. Testing contracts](##testing-contracts)
-    - [4. Debugging with hardhat network ](#d#ebugging-with-hardhat-network )
-    - [5. Deploying to live network](##Deploying-to-live-network)
+    - [1. Writing Smart Contracts](#writing-smart-contracts)
+    - [2. Compiling contracts](#compiling-contracts)
+    - [3. Testing contracts](#testing-contracts)
+    - [4. Debugging with hardhat network ](#debugging-with-hardhat-network )
+    - [5. Deploying to live network](#deploying-to-live-network)
     - [6. Usefull commands](#usefull-commands)
 
 # Introduction
