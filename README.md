@@ -193,42 +193,125 @@ notes:
 Run following command to test the contract: 
 `npx hardhat test`
 
-### 3. Deployments and Networks
+## 4. Debugging with hardhat network    
+ Hardhat allows you to deploy your contracts, run your tests and debug your code, all within the confines of your local machine. We don't need to set up anything for it as it has already default network setup. 
 
-[...]
+### console.log in solidity   
+We can console message or variables in Solidity code using hardhat/console.sol on top of the contract.   
+This is how it looks like using console.log in solidity: 
+```
+//SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+import "hardhat/console.sol";
 
-### 4. Tasks and Plugins
+contract Token {
+    string public name = "Hardhat Token";
+    string public symbol = "HT";
+    uint256 public totalSupply = 1000000;
+    address public owner;
 
-[...]
+    mapping(address => uint256) balances;
 
-### 5. Debugging and Tracing
+   
 
-[...]
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-### 6. Advanced Topics
+ 
+    constructor() {
+        balances[msg.sender] = totalSupply;
+        owner = msg.sender;
+    }
 
-[...]
+    function transfer(address to, uint256 amount) external {
+        require(balances[msg.sender] >= amount, "Not enough tokens");
 
-## Usage
+        console.log("test if console works");
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
 
-[...]
+        emit Transfer(msg.sender, to, amount);
+    }
 
-## Contributing
+    function balanceOf(address account) external view returns (uint256) {
+        return balances[account];
+    }
+}
+```
 
-[...]
+## 5. Deploying to live network   
+We can deploy to live networks like Sepolia and Goerli which does not cost money and still do all work we need to learn real world scenario.    
+Let's create a new directory called scripts inside the project root's directory, and then create new file name deploy.js and paste the following code into it:   
+```
+async function main() {
+  const [deployer] = await ethers.getSigners();
 
-## License
+  console.log("Deploying contracts with the account:", deployer.address);
 
-[...]
+  const token = await ethers.deployContract("Token");
 
-## Acknowledgments
+  console.log("Token address:", await token.getAddress());
+}
 
-[...]
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+```
+We need to use --network parameter when running any task to connect to connect any ethereum network.    Use following syntax:    
+`npx hardhat run scripts/deploy.js --network <network-name>`   
 
-## Contact Information
+Note:   
+We can also deploy without specifyig any network if we just want to test if deployment code works. In this case, the deployment get lost when hardhat finishes running. The result will look like:   
+```
+PS C:\work\web3\metana\my-hardhat-project> npx hardhat run scripts/deploy.js
+Deploying contracts with the account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Token address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+```
+### Deploying to local network   
+We can deploy to remote network such as mainnet or any other test networks by adding network entry in our hardhat.config file. For example,   
+```
+require("@nomicfoundation/hardhat-toolbox");
+const INFURA_API_KEY = "KEY";
 
-[...]
+const SEPOLIA_PRIVATE_KEY = "YOUR SEPOLIA PRIVATE KEY";
 
-## Additional Resources
+module.exports = {
+  solidity: "0.8.19",
+  networks: {
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [SEPOLIA_PRIVATE_KEY]
+    }
+  }
+};
+```
+Notes: 
+#### 1. Replace KEY   
+Replace with your own which you can get by visiting [Infura](https://infura.io), sign up, create a new API key
+#### 2. Import private key from coin base
+If you want to export your private key from coinbase Wallet, go to Settings > Developer Settings > Show private key   
 
-[...]
+#### 2. Import private key from metamask
+If you want to export your private key from Meta Wallet,   
+-> go to Account details by selecing account   
+-> Click on 3 dots which is appeared on right    
+-> Click on show private key   
+-> Enter password to access private key   
+
+Finally run following code to deploy contract:   
+`npx hardhat run scripts/deploy.js --network sepolia`   
+After running this command, you will be able to see deployed contract address. 
+   
+## 6. Useful Commands
+
+- **npx hardhat compile**: Compiles the Solidity smart contracts and generates artifacts.
+- **npx hardhat test**: Executes the tests in the `test/` directory using the configured testing framework.
+- **npx hardhat node**: Lists the accounts available on the specified network.
+- **npx hardhat accounts --network <NETWORK_NAME>**: Runs a custom script located at `<script_path>` within the project.
+- **npx hardhat run scripts/myScript.js**: Runs a custom script located at `<script_path>` within the project.
+
+
+
+
